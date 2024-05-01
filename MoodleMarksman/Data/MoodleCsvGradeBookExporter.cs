@@ -2,7 +2,7 @@
 using CsvHelper;
 using MoodleMarksman.Models;
 
-namespace MoodleMarksman;
+namespace MoodleMarksman.Data;
 
 /// <summary>
 /// Exports the specified gradebook to a CSV file, using a previous gradebook for header
@@ -41,7 +41,7 @@ public class MoodleCsvGradeBookExporter : IGradeBookExporter
                 record[StudentInfoColNames.Email]
             );
 
-            var marks = gradeBook.GetMarks(student.Email);
+            var marks = gradeBook.GetGrades(student.Email);
             foreach (var mark in marks)
             {
                 record[mark.ColName] = mark.Value?.ToString() ?? "";
