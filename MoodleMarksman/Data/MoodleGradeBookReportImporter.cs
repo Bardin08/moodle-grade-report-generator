@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Globalization;
+﻿using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using MoodleMarksman.Models;
@@ -39,25 +38,29 @@ public class MoodleGradeBookReportImporter : IGradeBookImporter
         csv.Read();
         csv.ReadHeader();
 
-        var gradeBook = new Dictionary<Student, List<Mark>>();
+        var gradeBook = new Dictionary<Student, List<Grade>>();
         var marksColNames = ColsUtils
-            .GetMarksColNames(csv.Context.Reader.HeaderRecord)
-            .ToList()
-            .AsReadOnly();
+            .GetGradesColNames(csv.Context.Reader.HeaderRecord)
+            .ToList();
 
         var gradeBookModel = new GradeBook(gradeBook, marksColNames);
 
         while (csv.Read())
         {
             var (student, marks) = GetGradeBookRow(csv, marksColNames);
+            if (student.Email == string.Empty)
+            {
+                continue;
+            }
+
             gradeBook.Add(student, marks);
         }
 
         return gradeBookModel;
     }
 
-    private static (Student student, List<Mark> marks) GetGradeBookRow(
-        CsvReader csv, ReadOnlyCollection<string> marksColNames)
+    private static (Student student, List<Grade> marks) GetGradeBookRow(
+        CsvReader csv, ICollection<string> marksColNames)
     {
         var student = new Student(
             csv.GetField<string>(StudentInfoColNames.FirstName),
@@ -67,7 +70,7 @@ public class MoodleGradeBookReportImporter : IGradeBookImporter
 
         var marks = csv.Context.Reader.HeaderRecord
             .Where(marksColNames.Contains)
-            .Select(header => new Mark(header, ColsUtils.GetMarkValue(csv, header)))
+            .Select(header => new Grade(header, ColsUtils.GetMarkValue(csv, header)))
             .ToList();
 
         return (student, marks);
