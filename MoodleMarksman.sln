@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodleMarksman", "MoodleMarksman\MoodleMarksman.csproj", "{8F40F744-5F79-4903-A4B3-1D70A87F165A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8F40F744-5F79-4903-A4B3-1D70A87F165A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F40F744-5F79-4903-A4B3-1D70A87F165A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F40F744-5F79-4903-A4B3-1D70A87F165A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F40F744-5F79-4903-A4B3-1D70A87F165A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,1 @@
+﻿internal record Student(string FirstName, string LastName, string Email);
