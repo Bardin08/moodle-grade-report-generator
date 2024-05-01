@@ -2,13 +2,14 @@
 using CsvHelper;
 using CsvHelper.Configuration;
 using MoodleMarksman.Models;
+using MoodleMarksman.Validation;
 
 namespace MoodleMarksman.Data;
 
 /// <summary>
 /// Imports a gradebook from a Moodle gradebook report.
 /// </summary>
-public class MoodleGradeBookReportImporter : IGradeBookImporter
+public class MoodleGradeBookReportImporter(IGradeBookValidator gradeBookValidator) : IGradeBookImporter
 {
     /// <inheritdoc />
     public GradeBook Import(string gradeBookPath)
@@ -18,7 +19,15 @@ public class MoodleGradeBookReportImporter : IGradeBookImporter
             throw new FileNotFoundException("The specified gradebook file could not be found.", gradeBookPath);
         }
 
-        return ImportInternal(gradeBookPath);
+        var validationResult = gradeBookValidator.Validate(gradeBookPath);
+        if (validationResult.IsValid)
+        {
+            return ImportInternal(gradeBookPath);
+        }
+
+        var errors = string.Join(":\n", validationResult.Errors!);
+        var errorMessage = $"The specified gradebook file is invalid. The following columns are missing: {errors}";
+        throw new InvalidDataException(errorMessage);
     }
 
     private GradeBook ImportInternal(string gradeBookPath)

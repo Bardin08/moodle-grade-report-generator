@@ -1,10 +1,11 @@
 ﻿using MoodleMarksman.Data;
+using MoodleMarksman.Validation;
 using MoodleMarksman.Visualization;
 
 const string updatedGradeBookPath = "updated.csv";
 const string exportedGradeBookPath = "exported.csv";
 
-var gradeBookProcessor = new MoodleGradeBookReportImporter();
+var gradeBookProcessor = new MoodleGradeBookReportImporter(new CsvGradeBookValidator());
 var gradeBook = gradeBookProcessor.Import(updatedGradeBookPath);
 
 var exportedGradeBook = gradeBookProcessor.Import(exportedGradeBookPath);

@@ -1,4 +1,6 @@
-﻿namespace MoodleMarksman.Data;
+﻿using CsvHelper;
+
+namespace MoodleMarksman.Data;
 
 /// <summary>
 /// Provides functionality for importing gradebooks from files.
