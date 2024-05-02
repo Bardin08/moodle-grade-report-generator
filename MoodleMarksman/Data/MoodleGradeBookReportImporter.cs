@@ -12,17 +12,12 @@ namespace MoodleMarksman.Data;
 public class MoodleGradeBookReportImporter(IGradeBookValidator gradeBookValidator) : IGradeBookImporter
 {
     /// <inheritdoc />
-    public GradeBook Import(string gradeBookPath)
+    public GradeBook Import(Stream gradeBookStream)
     {
-        if (!File.Exists(gradeBookPath))
-        {
-            throw new FileNotFoundException("The specified gradebook file could not be found.", gradeBookPath);
-        }
-
-        var validationResult = gradeBookValidator.Validate(gradeBookPath);
+        var validationResult = gradeBookValidator.Validate(gradeBookStream);
         if (validationResult.IsValid)
         {
-            return ImportInternal(gradeBookPath);
+            return ImportInternal(gradeBookStream);
         }
 
         var errors = string.Join(":\n", validationResult.Errors!);
@@ -30,10 +25,11 @@ public class MoodleGradeBookReportImporter(IGradeBookValidator gradeBookValidato
         throw new InvalidDataException(errorMessage);
     }
 
-    private GradeBook ImportInternal(string gradeBookPath)
+    private GradeBook ImportInternal(Stream gradeBookStream)
     {
-        using var reader = new StreamReader(gradeBookPath);
-        using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+        gradeBookStream.Seek(0, SeekOrigin.Begin);
+        var reader = new StreamReader(gradeBookStream);
+        var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
             Delimiter = ","

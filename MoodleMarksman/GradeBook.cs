@@ -38,11 +38,11 @@ public class GradeBook(
 
     public GradeBook Merge(GradeBook sourceGradeBook)
     {
-        foreach (var (student, grades) in _gradebook)
+        foreach (var (student, grades) in sourceGradeBook.Gradebook)
         {
-            foreach (var grade in grades.Where(grade => !sourceGradeBook.ImmutableGradesColNames.Contains(grade.ColName)))
+            foreach (var grade in grades.Where(grade => !_immutableGradesColNames.Contains(grade.ColName)))
             {
-                sourceGradeBook.UpsertStudentAndGrade(student, grade);
+                UpsertStudentAndGrade(student, grade);
             }
         }
 

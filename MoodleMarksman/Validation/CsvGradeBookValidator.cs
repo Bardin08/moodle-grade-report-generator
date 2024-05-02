@@ -11,7 +11,7 @@ public class CsvGradeBookValidator : IGradeBookValidator
         HasHeaderRecord = true
     };
 
-    public ValidationResult Validate(string gradeBookPath, CsvConfiguration? csvConfiguration = null)
+    public ValidationResult Validate(Stream gradeBookStream, CsvConfiguration? csvConfiguration = null)
     {
         csvConfiguration ??= DefaultCsvConfiguration;
         // Rules:
@@ -20,13 +20,8 @@ public class CsvGradeBookValidator : IGradeBookValidator
         // Can (optionally) contain cols that'd matched to the MetadataColNames (LastDownloaded)
         // Must contain at least one grade col
 
-        if (!File.Exists(gradeBookPath))
-        {
-            return new ValidationResult(
-                false, new HashSet<string> { "The specified gradebook file could not be found." });
-        }
-
-        var csvReader = new CsvReader(new StreamReader(gradeBookPath), csvConfiguration);
+        var streamReader = new StreamReader(gradeBookStream);
+        var csvReader = new CsvReader(streamReader, csvConfiguration);
         csvReader.Read();
         csvReader.ReadHeader();
 

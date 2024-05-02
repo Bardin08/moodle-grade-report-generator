@@ -8,10 +8,12 @@ namespace MoodleMarksman.Validation;
 public interface IGradeBookValidator
 {
     /// <summary>
-    /// Validates a gradebook file at the specified path.
+    /// Validates a gradebook represented by the provided stream, ensuring structural integrity,
+    /// correct data types, and potential custom rules (if specified in the csvConfiguration).
     /// </summary>
-    /// <param name="gradeBookPath">The full path to the gradebook file.</param>
-    /// <param name="csvConfiguration"></param>
+    /// <param name="gradeBookStream">A Stream containing gradebook data in CSV format.</param>
+    /// <param name="csvConfiguration">An optional CsvConfiguration object to customize column
+    /// mapping, data type expectations, or additional validation rules.</param>
     /// <returns>A ValidationResult object indicating the validity of the gradebook and any associated errors.</returns>
-    ValidationResult Validate(string gradeBookPath, CsvConfiguration? csvConfiguration = null);
+    ValidationResult Validate(Stream gradeBookStream, CsvConfiguration? csvConfiguration = null);
 }

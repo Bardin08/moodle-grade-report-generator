@@ -13,10 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="updated.csv">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="exported.csv">
+      <None Update="from-moodle.csv">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

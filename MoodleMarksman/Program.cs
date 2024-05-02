@@ -1,23 +1,32 @@
-﻿using MoodleMarksman.Data;
+﻿using MoodleMarksman.Clients;
+using MoodleMarksman.Data;
 using MoodleMarksman.Validation;
 using MoodleMarksman.Visualization;
 
-const string updatedGradeBookPath = "updated.csv";
-const string exportedGradeBookPath = "exported.csv";
+const string spreadsheetId = "spreadsheetId";
+const string sheetGid = "sheetGid";
 
+const string exportedGradeBookPath = "from-moodle.csv";
+var moodleGradeBookStream = File.OpenRead(exportedGradeBookPath);
 var gradeBookProcessor = new MoodleGradeBookReportImporter(new CsvGradeBookValidator());
-var gradeBook = gradeBookProcessor.Import(updatedGradeBookPath);
+var moodleGradeBook = gradeBookProcessor.Import(moodleGradeBookStream);
 
-var exportedGradeBook = gradeBookProcessor.Import(exportedGradeBookPath);
-exportedGradeBook.GradesColsAsImmutable(exportedGradeBook.GradesColNames
+
+var googleSpreadsheetDownloader = new GoogleSpreadsheetDownloader();
+var fromSpreadsheetStream = await googleSpreadsheetDownloader.DownloadSheetAsCsv(spreadsheetId, sheetGid);
+var actualGradeBook = gradeBookProcessor.Import(fromSpreadsheetStream);
+
+
+actualGradeBook.GradesColsAsImmutable(actualGradeBook.GradesColNames
     .Where(x => x.StartsWith("Quiz", StringComparison.OrdinalIgnoreCase)));
 
-gradeBook.Merge(exportedGradeBook);
+moodleGradeBook.Merge(actualGradeBook);
+
 
 var moodleCsvGradeBookExporter = new MoodleCsvGradeBookExporter();
-moodleCsvGradeBookExporter.Export(exportedGradeBookPath, exportedGradeBook);
+moodleCsvGradeBookExporter.Export(exportedGradeBookPath, moodleGradeBook);
 
-GradeBookVisualizer.DisplayGradeBook(exportedGradeBook);
+GradeBookVisualizer.DisplayGradeBook(moodleGradeBook);
 
 
 
