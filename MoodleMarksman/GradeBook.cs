@@ -4,8 +4,7 @@ using MoodleMarksman.Models;
 namespace MoodleMarksman;
 
 public class GradeBook(
-    Dictionary<Student, List<Grade>> gradebook,
-    IEnumerable<string> gradesColNames)
+    Dictionary<Student, List<Grade>> gradebook)
 {
     private readonly Dictionary<Student, List<Grade>> _gradebook = gradebook;
     private readonly List<string> _immutableGradesColNames = [];
@@ -15,12 +14,7 @@ public class GradeBook(
     /// <summary>
     /// Gets the available column names representing grades (grades).
     /// </summary>
-    public IEnumerable<string> GradesColNames => gradesColNames;
-
-    /// <summary>
-    /// Gets the column names of grades that are considered immutable.
-    /// </summary>
-    private IEnumerable<string> ImmutableGradesColNames => _immutableGradesColNames;
+    public IEnumerable<string> GradesColNames => Gradebook.First().Value.Select(x => x.ColName);
 
     /// <summary>
     /// Retrieves the grades associated with a student's email.
@@ -36,17 +30,38 @@ public class GradeBook(
         return GetStudentGrades(email);
     }
 
-    public GradeBook Merge(GradeBook sourceGradeBook)
+    public GradeBook Merge(GradeBook other)
     {
-        foreach (var (student, grades) in sourceGradeBook.Gradebook)
+        var newGradeBook = new GradeBook(_gradebook);
+
+        foreach (var (student, grades) in other.Gradebook)
         {
-            foreach (var grade in grades.Where(grade => !_immutableGradesColNames.Contains(grade.ColName)))
+            try
             {
-                UpsertStudentAndGrade(student, grade);
+                var oldGrades = GetStudentGrades(student.Email);
+                if (oldGrades is null && grades is null)
+                {
+                    continue;
+                }
+
+                // todo: what's the purpose of this check?
+                if (oldGrades?.SequenceEqual(grades) ?? false)
+                {
+                    continue;
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+
+            foreach (var grade in grades)
+            {
+                newGradeBook.UpsertStudentAndGrade(student, grade);
             }
         }
 
-        return sourceGradeBook;
+        return newGradeBook;
     }
 
     public void GradesColsAsImmutable(IEnumerable<string> colsNames)

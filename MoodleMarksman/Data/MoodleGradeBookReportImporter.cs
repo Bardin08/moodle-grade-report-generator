@@ -12,12 +12,12 @@ namespace MoodleMarksman.Data;
 public class MoodleGradeBookReportImporter(IGradeBookValidator gradeBookValidator) : IGradeBookImporter
 {
     /// <inheritdoc />
-    public GradeBook Import(Stream gradeBookStream)
+    public GradeBook Import(Stream gradeBookStream, IReadOnlyList<string>? colsNames = null)
     {
         var validationResult = gradeBookValidator.Validate(gradeBookStream);
         if (validationResult.IsValid)
         {
-            return ImportInternal(gradeBookStream);
+            return ImportInternal(gradeBookStream, colsNames);
         }
 
         var errors = string.Join(":\n", validationResult.Errors!);
@@ -25,7 +25,7 @@ public class MoodleGradeBookReportImporter(IGradeBookValidator gradeBookValidato
         throw new InvalidDataException(errorMessage);
     }
 
-    private GradeBook ImportInternal(Stream gradeBookStream)
+    private GradeBook ImportInternal(Stream gradeBookStream, IReadOnlyList<string>? colsNames = null)
     {
         gradeBookStream.Seek(0, SeekOrigin.Begin);
         var reader = new StreamReader(gradeBookStream);
@@ -35,24 +35,30 @@ public class MoodleGradeBookReportImporter(IGradeBookValidator gradeBookValidato
             Delimiter = ","
         });
 
-        return ParseGradeBookInternal(csv);
+        return ParseGradeBookInternal(csv, colsNames);
     }
 
-    private GradeBook ParseGradeBookInternal(CsvReader csv)
+    private GradeBook ParseGradeBookInternal(CsvReader csv, IReadOnlyList<string>? colsNames = null)
     {
         csv.Read();
         csv.ReadHeader();
 
         var gradeBook = new Dictionary<Student, List<Grade>>();
         var marksColNames = ColsUtils
-            .GetGradesColNames(csv.Context.Reader.HeaderRecord)
-            .ToList();
+            .GetGradesColNames(csv.Context.Reader.HeaderRecord);
 
-        var gradeBookModel = new GradeBook(gradeBook, marksColNames);
+        if (colsNames is not null)
+        {
+            marksColNames = marksColNames.Where(colsNames.Contains);
+        }
+
+        marksColNames = marksColNames.ToList();
+
+        var gradeBookModel = new GradeBook(gradeBook);
 
         while (csv.Read())
         {
-            var (student, marks) = GetGradeBookRow(csv, marksColNames);
+            var (student, marks) = GetGradeBookRow(csv, marksColNames.ToList());
             if (student.Email == string.Empty)
             {
                 continue;

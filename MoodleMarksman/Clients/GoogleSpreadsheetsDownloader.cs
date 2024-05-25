@@ -21,10 +21,9 @@ public class GoogleSpreadsheetDownloader
     /// </summary>
     /// <param name="spreadsheetId">The ID of the Google Sheet.</param>
     /// <param name="sheetGid">The GID (sheet ID) of the sheet within the spreadsheet.</param>
-    /// <param name="outputFilePath">The path to save the CSV file.</param>
     /// <returns>A Task representing the asynchronous download operation.</returns>
     public async Task<Stream> DownloadSheetAsCsv(
-        string spreadsheetId, string sheetGid, string outputFilePath = "output_file.csv")
+        string spreadsheetId, string sheetGid)
     {
         var downloadUrl = $"https://docs.google.com/spreadsheets/d/{spreadsheetId}/export?format=csv&gid={sheetGid}";
 

@@ -41,18 +41,35 @@ public class MoodleCsvGradeBookExporter : IGradeBookExporter
                 record[StudentInfoColNames.Email]
             );
 
-            var marks = gradeBook.GetGrades(student.Email);
-            foreach (var mark in marks)
+            try
             {
-                record[mark.ColName] = mark.Value?.ToString() ?? "";
-            }
+                var marks = gradeBook.GetGrades(student.Email);
+                foreach (var mark in marks)
+                {
+                    record[mark.ColName] = mark.Value?.ToString() ?? "";
+                }
 
-            foreach (var key in record.Keys)
+                foreach (var key in record.Keys)
+                {
+                    csvWriter.WriteField(record[key]);
+                }
+
+                csvWriter.NextRecord();
+            }
+            catch (Exception e)
             {
-                csvWriter.WriteField(record[key]);
+                const bool skipMissingStudents = true;
+                if (skipMissingStudents)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Skipping student: " + student.Email);
+                    Console.ResetColor();
+                }
+                else
+                {
+                    throw;
+                }
             }
-
-            csvWriter.NextRecord();
         }
 
         return Path.GetFullPath("temp.csv");
