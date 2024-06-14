@@ -12,7 +12,8 @@ namespace MoodleMarksman.Data;
 public class MoodleGradeBookReportImporter(IGradeBookValidator gradeBookValidator) : IGradeBookImporter
 {
     /// <inheritdoc />
-    public GradeBook Import(Stream gradeBookStream, IReadOnlyList<string>? colsNames = null)
+    public GradeBook Import(
+        Stream gradeBookStream, IReadOnlyList<string>? colsNames = null, bool useStrictValidation = true)
     {
         var validationResult = gradeBookValidator.Validate(gradeBookStream);
         if (validationResult.IsValid)
@@ -32,7 +33,8 @@ public class MoodleGradeBookReportImporter(IGradeBookValidator gradeBookValidato
         var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
-            Delimiter = ","
+            Delimiter = ",",
+            MissingFieldFound = null
         });
 
         return ParseGradeBookInternal(csv, colsNames);

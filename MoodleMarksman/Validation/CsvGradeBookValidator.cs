@@ -40,7 +40,8 @@ public class CsvGradeBookValidator : IGradeBookValidator
             : new ValidationResult(false, missingCols);
     }
 
-    private static HashSet<string> CheckMissingCols(string[] headerRecord, List<string> gradeColNames)
+    private static HashSet<string> CheckMissingCols(
+        string[] headerRecord, List<string> gradeColNames, bool useStrict = true)
     {
         var missingCols = new HashSet<string>();
         var studentInfoCols = new HashSet<string>
@@ -50,9 +51,20 @@ public class CsvGradeBookValidator : IGradeBookValidator
             StudentInfoColNames.Email
         };
 
-        if (!headerRecord.Any(studentInfoCols.Contains))
+        if (useStrict)
         {
-            missingCols.Add("Student information columns");
+            if (!headerRecord.Any(studentInfoCols.Contains))
+            {
+                missingCols.Add("Student information columns");
+            }
+        }
+        else
+        {
+            var atLEastOneStudentInfoCol = headerRecord.Any(studentInfoCols.Contains);
+            if (!atLEastOneStudentInfoCol)
+            {
+                missingCols.Add("Student information columns");
+            }
         }
 
         if (!headerRecord.Any(gradeColNames.Contains))

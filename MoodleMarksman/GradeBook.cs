@@ -30,7 +30,7 @@ public class GradeBook(
         return GetStudentGrades(email);
     }
 
-    public GradeBook Merge(GradeBook other)
+    public GradeBook Merge(GradeBook other, bool useStrictMode)
     {
         var newGradeBook = new GradeBook(_gradebook);
 
@@ -57,7 +57,7 @@ public class GradeBook(
 
             foreach (var grade in grades)
             {
-                newGradeBook.UpsertStudentAndGrade(student, grade);
+                newGradeBook.UpsertStudentAndGrade(student, grade, useStrictMode);
             }
         }
 
@@ -109,9 +109,14 @@ public class GradeBook(
         }
     }
 
-    private void UpsertStudentAndGrade(Student student, Grade grade)
+    private void UpsertStudentAndGrade(Student student, Grade grade, bool useStrictMode)
     {
-        if (!_gradebook.ContainsKey(student))
+        var studentDescriptor = useStrictMode
+            ? student
+            : _gradebook.Keys.FirstOrDefault(x => x.Email == student.Email);
+
+        if (studentDescriptor is null ||
+            !_gradebook.ContainsKey(studentDescriptor))
         {
             InsertStudentAndGrade(student, grade);
             return;

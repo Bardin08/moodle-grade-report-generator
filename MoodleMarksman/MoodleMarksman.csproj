@@ -14,7 +14,7 @@
 
     <ItemGroup>
       <None Update="current-marks.csv">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 

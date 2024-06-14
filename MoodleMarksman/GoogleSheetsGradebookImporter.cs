@@ -18,8 +18,9 @@ public class GoogleSheetsGradebookImporter
             var fromSpreadsheetStream = await googleSpreadsheetDownloader
                 .DownloadSheetAsCsv(request.SpreadsheetId, gid);
 
-            var actualGradeBook = gradeBookProcessor.Import(fromSpreadsheetStream, colsToImport);
-            gradeBook = gradeBook.Merge(actualGradeBook);
+            var actualGradeBook = gradeBookProcessor.Import(
+                fromSpreadsheetStream, colsToImport, useStrictValidation: false);
+            gradeBook = gradeBook.Merge(actualGradeBook, useStrictMode: false);
         }
 
         return gradeBook;

@@ -10,8 +10,9 @@ public interface IGradeBookImporter
     /// </summary>
     /// <param name="gradeBookStream">A Stream containing the CSV-formatted gradebook data.</param>
     /// <param name="colsNames">Columns that will be imported.</param>
+    /// <param name="useStrictValidation">Require all user ID columns (First & Last name + email).</param>
     /// <returns>A GradeBook object representing the imported data.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the specified gradebook file cannot be found.</exception>
     /// <exception cref="InvalidDataException">Thrown if the file is corrupt, contains structural errors, or has data inconsistencies preventing successful parsing.</exception>
-    GradeBook Import(Stream gradeBookStream, IReadOnlyList<string> colsNames);
+    GradeBook Import(Stream gradeBookStream, IReadOnlyList<string> colsNames, bool useStrictValidation = true);
 }
